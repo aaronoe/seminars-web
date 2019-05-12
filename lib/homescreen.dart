@@ -1,20 +1,16 @@
-// user defined function
 import 'package:flutter_web/material.dart';
-import 'package:matchings/model/socket_data.dart';
-import 'package:matchings/repository.dart';
+import 'package:matchings/scoped_models/app_model.dart';
 import 'package:matchings/students_screen.dart';
+import 'package:matchings/util/scoped_model.dart';
 
 void _showDialog(BuildContext context) {
-  // flutter defined function
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      // return object of type Dialog
       return AlertDialog(
         title: new Text("Alert Dialog title"),
         content: new Text("Alert Dialog body"),
         actions: <Widget>[
-          // usually buttons at the bottom of the dialog
           new FlatButton(
             child: new Text("Close"),
             onPressed: () {
@@ -27,28 +23,7 @@ void _showDialog(BuildContext context) {
   );
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  SocketData data;
-
-  @override
-  void initState() {
-    super.initState();
-    Repository().students.listen((data) {
-      setState(() {
-        this.data = data;
-      });
-    });
-  }
-
+class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -70,14 +45,18 @@ class _MyHomePageState extends State<MyHomePage> {
               Tab(child: Text("Run & Results"))
             ],
           ),
-          title: Text(widget.title),
+          title: Text("Seminar Matchings"),
         ),
-        body: TabBarView(
-          children: <Widget>[
-            StudentsScreen(),
-            Text("Data: ${data?.students}"),
-            Text("Three"),
-          ],
+        body: ScopedModelDescendant<AppModel>(
+          builder: (BuildContext context, Widget child, AppModel model) {
+            return TabBarView(
+              children: <Widget>[
+                StudentsScreen(),
+                Text("Data: ${model?.students}"),
+                Text("Three"),
+              ],
+            );
+          },
         ), // This trailing comma makes auto-formatting nicer for build methods.
       ),
     );
