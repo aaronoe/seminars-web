@@ -1,5 +1,6 @@
 import 'package:flutter_web/material.dart';
 import 'package:matchings/scoped_models/app_model.dart';
+import 'package:matchings/seminar_screen.dart';
 import 'package:matchings/students_screen.dart';
 import 'package:matchings/util/scoped_model.dart';
 
@@ -52,7 +53,7 @@ class HomePage extends StatelessWidget {
             return TabBarView(
               children: <Widget>[
                 StudentsScreen(),
-                Text("Data: ${model?.students}"),
+                SeminarScreen(),
                 Text("Three"),
               ],
             );
