@@ -4,25 +4,7 @@ import 'package:matchings/seminar_screen.dart';
 import 'package:matchings/students_screen.dart';
 import 'package:matchings/util/scoped_model.dart';
 
-void _showDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: new Text("Alert Dialog title"),
-        content: new Text("Alert Dialog body"),
-        actions: <Widget>[
-          new FlatButton(
-            child: new Text("Close"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+import 'seminars/new_seminar_form.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -30,12 +12,6 @@ class HomePage extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            _showDialog(context);
-          },
-          child: Icon(Icons.ac_unit),
-        ),
         appBar: AppBar(
           bottom: TabBar(
             tabs: <Widget>[
@@ -54,7 +30,7 @@ class HomePage extends StatelessWidget {
               children: <Widget>[
                 StudentsScreen(),
                 SeminarScreen(),
-                Text("Three"),
+                NewSeminarForm(),
               ],
             );
           },

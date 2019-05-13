@@ -33,4 +33,28 @@ class AppModel extends Model {
     return await _client.delete("$BASE_URL/students/${student.id}",
         headers: {"Origin": "test"});
   }
+
+  Future deleteSeminar(Seminar seminar) async {
+    return await _client.delete("$BASE_URL/seminars/${seminar.id}",
+        headers: {"Origin": "test"});
+  }
+
+  Future<http.Response> postData(String url, Map<String, dynamic> body) async {
+    return _client.post(url,
+        body: json.encode(body),
+        headers: {"Content-Type": "application/json"},
+        encoding: Encoding.getByName("application/json"));
+  }
+
+  Future createSeminar(String name, int capacity) async {
+    await postData(
+        "$BASE_URL/seminars", {'name': name, 'capacity': capacity.toString()});
+  }
+
+  Future createStudent(String name, List<Seminar> priorities) async {
+    await postData("$BASE_URL/students", {
+      'name': name,
+      'preferences': priorities.map((seminar) => seminar.toJson()).toList()
+    });
+  }
 }

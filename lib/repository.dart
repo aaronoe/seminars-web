@@ -38,7 +38,7 @@ class Repository {
     return students.stream;
   }
 
-  Future createSeminar() async {
+  Future createSeminar(String name, int capacity) async {
     await postData("$BASE_URL/seminars");
   }
 

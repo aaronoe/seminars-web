@@ -3,6 +3,7 @@ import 'package:matchings/scoped_models/app_model.dart';
 import 'package:matchings/util/scoped_model.dart';
 
 import 'model/student.dart';
+import 'new_student_form.dart';
 
 class StudentsScreen extends StatefulWidget {
   @override
@@ -21,9 +22,22 @@ class _StudentsScreenState extends State<StudentsScreen> {
         return GridView.count(
           childAspectRatio: 3,
           children: model.students
-              .map((student) => StudentCard(student: student))
-              .toList(),
-          crossAxisCount: 8,
+              .map<Widget>((student) => StudentCard(student: student))
+              .toList()
+                ..insert(
+                    0,
+                    Card(
+                      child: Center(
+                          child: RaisedButton(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (BuildContext context) {
+                                  return NewStudentForm();
+                                }));
+                              },
+                              child: Text("Add new"))),
+                    )),
+          crossAxisCount: (MediaQuery.of(context).size.width / 300).floor(),
         );
       }
     });

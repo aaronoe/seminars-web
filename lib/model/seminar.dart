@@ -7,9 +7,12 @@ class Seminar {
 
   factory Seminar.fromJson(Map<String, dynamic> json) {
     return Seminar(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      capacity: json['thumbnailUrl'] as int,
-    );
+        id: json['id'] as String,
+        name: json['name'] as String,
+        capacity: json['capacity'] as int);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'name': name, 'capacity': capacity, 'id': id};
   }
 }
