@@ -13,8 +13,6 @@ class _NewStudentFormState extends State<NewStudentForm> {
   final _priorities = List<Seminar>();
   String _name = "";
 
-  _NewStudentFormState();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +74,7 @@ class _NewStudentFormState extends State<NewStudentForm> {
                               : Text("Available Seminars:"))),
         RaisedButton(
           onPressed: () async {
-            await model.createStudent(_name, _priorities);
+            model.createStudent(_name, _priorities);
             Navigator.of(context).pop();
           },
           child: Text('Save'),

@@ -16,7 +16,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     return ScopedModelDescendant<AppModel>(
         builder: (BuildContext context, Widget child, AppModel model) {
       if (model.students.isEmpty) {
-        return Center(child: Text("No students yet"));
+        return buildNewStudentCard(context);
       } else {
         print("New student length: ${model.students.length}");
         return GridView.count(
@@ -24,23 +24,25 @@ class _StudentsScreenState extends State<StudentsScreen> {
           children: model.students
               .map<Widget>((student) => StudentCard(student: student))
               .toList()
-                ..insert(
-                    0,
-                    Card(
-                      child: Center(
-                          child: RaisedButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (BuildContext context) {
-                                  return NewStudentForm();
-                                }));
-                              },
-                              child: Text("Add new"))),
-                    )),
+                ..insert(0, buildNewStudentCard(context)),
           crossAxisCount: (MediaQuery.of(context).size.width / 300).floor(),
         );
       }
     });
+  }
+
+  Card buildNewStudentCard(BuildContext context) {
+    return Card(
+      child: Center(
+          child: RaisedButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (BuildContext context) {
+                  return NewStudentForm();
+                }));
+              },
+              child: Text("Add new"))),
+    );
   }
 }
 

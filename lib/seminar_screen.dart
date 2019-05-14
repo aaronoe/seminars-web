@@ -65,27 +65,29 @@ class SeminarScreen extends StatelessWidget {
     return ScopedModelDescendant<AppModel>(
         builder: (BuildContext context, Widget child, AppModel model) {
       if (model.seminars.isEmpty) {
-        return Center(child: Text("No seminars yet"));
+        return buildNewSeminarCard(context);
       } else {
         return GridView.count(
           childAspectRatio: 3,
           children: model.seminars
               .map<Widget>((seminar) => SeminarCard(seminar: seminar))
               .toList()
-                ..insert(
-                    0,
-                    Card(
-                      child: Center(
-                          child: RaisedButton(
-                              onPressed: () async {
-                                await _showSeminarDialog(context);
-                              },
-                              child: Text("Add new"))),
-                    )),
+                ..insert(0, buildNewSeminarCard(context)),
           crossAxisCount: (MediaQuery.of(context).size.width / 300).floor(),
         );
       }
     });
+  }
+
+  Card buildNewSeminarCard(BuildContext context) {
+    return Card(
+      child: Center(
+          child: RaisedButton(
+              onPressed: () async {
+                await _showSeminarDialog(context);
+              },
+              child: Text("Add new"))),
+    );
   }
 }
 

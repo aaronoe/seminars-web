@@ -4,7 +4,7 @@ import 'package:matchings/seminar_screen.dart';
 import 'package:matchings/students_screen.dart';
 import 'package:matchings/util/scoped_model.dart';
 
-import 'seminars/new_seminar_form.dart';
+import 'matching_screen.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -13,6 +13,21 @@ class HomePage extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
+          actions: <Widget>[
+            ScopedModelDescendant<AppModel>(
+              builder: (BuildContext context, Widget child, AppModel model) {
+                return FlatButton(
+                  child: Text(
+                    "Download Data",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () async {
+                    await model.downloadData();
+                  },
+                );
+              },
+            )
+          ],
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
@@ -28,9 +43,18 @@ class HomePage extends StatelessWidget {
           builder: (BuildContext context, Widget child, AppModel model) {
             return TabBarView(
               children: <Widget>[
-                StudentsScreen(),
-                SeminarScreen(),
-                NewSeminarForm(),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: StudentsScreen(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SeminarScreen(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: MatchingScreen(),
+                )
               ],
             );
           },
