@@ -9,18 +9,35 @@ class MatchingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<AppModel>(
       builder: (BuildContext context, Widget child, AppModel model) {
-        if (model.matchings.isEmpty) {
+        if (model.matchData == null || model.matchData.matchings.isEmpty) {
           return _buildComputeButton(model);
         } else {
           return GridView.count(
-            children: model.matchings
+            children: model.matchData.matchings
                 .map<Widget>((matching) => MatchingCard(matching: matching))
                 .toList()
-                  ..insert(0, _buildComputeButton(model)),
+                  ..insert(0, _buildResultButton(model)),
             crossAxisCount: (MediaQuery.of(context).size.width / 300).floor(),
           );
         }
       },
+    );
+  }
+
+  Widget _buildResultButton(AppModel model) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text("Profile ${model.matchData.profile}"),
+        Container(height: 4.0),
+        Text("Unassigned Student Count: ${model.matchData.unassignedCount}"),
+        Container(height: 16.0),
+        RaisedButton(
+            child: Text("Compute Matching"),
+            onPressed: () async {
+              await model.getMatching();
+            }),
+      ],
     );
   }
 
