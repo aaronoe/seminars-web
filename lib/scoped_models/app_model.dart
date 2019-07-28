@@ -32,8 +32,8 @@ class AppModel extends Model {
   List<Seminar> get seminars => _seminars;
   MatchData get matchData => _matchData;
 
-  Future getMatching() async {
-    final response = await _client.get("$BASE_URL/match");
+  Future getMatching(String algorithm) async {
+    final response = await _client.get("$BASE_URL/match/$algorithm");
     final parsed = json.decode(response.body);
 
     print(parsed);

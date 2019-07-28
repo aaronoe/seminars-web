@@ -32,23 +32,63 @@ class MatchingScreen extends StatelessWidget {
         Container(height: 4.0),
         Text("Unassigned Student Count: ${model.matchData.unassignedCount}"),
         Container(height: 16.0),
-        RaisedButton(
-            child: Text("Compute Matching"),
-            onPressed: () async {
-              await model.getMatching();
-            }),
+        ComputeButton()
       ],
     );
   }
 
+  Widget _buildButtonForAlgorithm(AppModel model, String algorithm) {
+    return RaisedButton(
+        child: Text(algorithm),
+        onPressed: () async {
+          await model.getMatching(algorithm);
+        });
+  }
+
   Widget _buildComputeButton(AppModel model) {
     return Center(
-      child: RaisedButton(
-          child: Text("Compute Matching"),
-          onPressed: () async {
-            await model.getMatching();
-          }),
+      child: ComputeButton(),
     );
+  }
+}
+
+class ComputeButton extends StatefulWidget {
+  @override
+  _ComputeButtonState createState() => _ComputeButtonState();
+}
+
+class _ComputeButtonState extends State<ComputeButton> {
+  String selection = "hungarian";
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+      DropdownButton<String>(
+          value: selection,
+          items: <String>[
+            "hungarian",
+            "rsd",
+            "popular",
+            "max-pareto",
+            "popular-mod"
+          ]
+              .map((item) => DropdownMenuItem(child: Text(item), value: item))
+              .toList(),
+          iconSize: 0.0,
+          onChanged: (String newValue) {
+            setState(() {
+              selection = newValue;
+            });
+          }),
+      Container(width: 8.0),
+      ScopedModelDescendant<AppModel>(
+        builder: (BuildContext context, Widget child, AppModel model) {
+          return RaisedButton(
+              onPressed: () async => await model.getMatching(selection),
+              child: Text("Find Matching"));
+        },
+      )
+    ]);
   }
 }
 
@@ -62,7 +102,9 @@ class MatchingCard extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
+        child: ListView(
+            shrinkWrap: true,
+            physics: ClampingScrollPhysics(),
             children: [
                   Padding(
                     padding: const EdgeInsets.all(4.0),

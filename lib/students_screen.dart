@@ -59,7 +59,8 @@ class StudentCard extends StatelessWidget {
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Text(student.name),
+            Text(student.name.substring(
+                0, student.name.length > 15 ? 15 : student.name.length)),
             ScopedModelDescendant<AppModel>(
               builder: (BuildContext context, Widget child, AppModel model) {
                 return FlatButton(
