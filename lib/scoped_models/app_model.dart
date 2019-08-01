@@ -9,7 +9,8 @@ import 'package:matchings/model/student.dart';
 import 'package:matchings/util/scoped_model.dart';
 
 class AppModel extends Model {
-  static final BASE_URL = "http://127.0.0.1:8000";
+  static final _BASE_HOST = "seminar-matching.herokuapp.com/";
+  static final BASE_URL = "https://$_BASE_HOST";
   final _client = http.Client();
 
   List<Student> _students = [];
@@ -17,7 +18,7 @@ class AppModel extends Model {
   MatchData _matchData;
 
   AppModel() {
-    WebSocket('ws://127.0.0.1:8000/')
+    WebSocket('wss://$_BASE_HOST/')
         .onMessage
         .map((item) => SocketData.fromJson(json.decode(item.data)))
         .listen((data) {
