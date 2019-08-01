@@ -11,8 +11,7 @@ class SeminarScreen extends StatelessWidget {
 
     return showDialog(
       context: context,
-      barrierDismissible:
-          true, // dialog is dismissible with a tap on the barrier
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Create new seminar'),
@@ -48,7 +47,8 @@ class SeminarScreen extends StatelessWidget {
                 return FlatButton(
                   child: Text('Save'),
                   onPressed: () async {
-                    await model.createSeminar(title, capacity);
+                    if (title.isEmpty) return;
+                    model.createSeminar(title, capacity);
                     Navigator.of(context).pop();
                   },
                 );
