@@ -3,63 +3,9 @@ import 'package:matchings/scoped_models/app_model.dart';
 import 'package:matchings/util/scoped_model.dart';
 
 import 'model/seminar.dart';
+import 'new_student_form.dart';
 
 class SeminarScreen extends StatelessWidget {
-  Future _showSeminarDialog(BuildContext context) async {
-    String title = '';
-    int capacity = 0;
-
-    return showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Create new seminar'),
-          content: Form(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  autofocus: true,
-                  decoration: InputDecoration(
-                      labelText: 'Seminar title',
-                      hintText: 'eg. Graphalgorithms'),
-                  onChanged: (value) {
-                    title = value;
-                  },
-                ),
-                TextField(
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      WhitelistingTextInputFormatter.digitsOnly
-                    ],
-                    onChanged: (value) {
-                      capacity = int.parse(value);
-                    },
-                    decoration: InputDecoration(
-                        labelText: "Capacity", hintText: "eg. 12"))
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            ScopedModelDescendant<AppModel>(
-              builder: (BuildContext context, Widget child, AppModel model) {
-                return FlatButton(
-                  child: Text('Save'),
-                  onPressed: () async {
-                    if (title.isEmpty) return;
-                    model.createSeminar(title, capacity);
-                    Navigator.of(context).pop();
-                  },
-                );
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<AppModel>(
@@ -68,7 +14,7 @@ class SeminarScreen extends StatelessWidget {
         return buildNewSeminarCard(context);
       } else {
         return GridView.count(
-          childAspectRatio: 3,
+          childAspectRatio: 2,
           children: model.seminars
               .map<Widget>((seminar) => SeminarCard(seminar: seminar))
               .toList()
@@ -91,6 +37,74 @@ class SeminarScreen extends StatelessWidget {
   }
 }
 
+Future _showSeminarDialog(BuildContext context,
+    {Mode mode = Mode.CREATE, Seminar existingSeminar}) async {
+  String title = existingSeminar != null ? existingSeminar.name : '';
+  int capacity = existingSeminar != null ? existingSeminar.capacity : 0;
+  TextEditingController titleController = TextEditingController(text: title);
+  TextEditingController capacityController =
+      TextEditingController(text: capacity != 0 ? capacity.toString() : null);
+
+  return showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Create new seminar'),
+        content: Form(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                autofocus: true,
+                decoration: InputDecoration(
+                    labelText: 'Seminar title',
+                    hintText: 'eg. Graphalgorithms'),
+                onChanged: (value) {
+                  title = value;
+                },
+                controller: titleController,
+              ),
+              TextField(
+                  controller: capacityController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    WhitelistingTextInputFormatter.digitsOnly
+                  ],
+                  onChanged: (value) {
+                    capacity = int.parse(value);
+                  },
+                  decoration: InputDecoration(
+                      labelText: "Capacity", hintText: "eg. 12"))
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          ScopedModelDescendant<AppModel>(
+            builder: (BuildContext context, Widget child, AppModel model) {
+              return FlatButton(
+                child: Text('Save'),
+                onPressed: () async {
+                  if (title.isEmpty) return;
+                  if (mode == Mode.CREATE) {
+                    model.createSeminar(title, capacity);
+                  } else if (mode == Mode.EDIT) {
+                    model.updateSeminar(Seminar(
+                        id: existingSeminar.id,
+                        name: title,
+                        capacity: capacity));
+                  }
+                  Navigator.of(context).pop();
+                },
+              );
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 class SeminarCard extends StatelessWidget {
   final Seminar seminar;
 
@@ -103,13 +117,26 @@ class SeminarCard extends StatelessWidget {
         child: ListTile(
             title: Text(seminar.name),
             subtitle: Text("Capacity: ${seminar.capacity}"),
-            trailing: ScopedModelDescendant<AppModel>(
-              builder: (BuildContext context, Widget child, AppModel model) {
-                return FlatButton(
-                    color: Theme.of(context).buttonColor,
-                    onPressed: () async => await model.deleteSeminar(seminar),
-                    child: Text("Delete"));
-              },
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                RaisedButton(
+                    onPressed: () async {
+                      await _showSeminarDialog(context,
+                          mode: Mode.EDIT, existingSeminar: seminar);
+                    },
+                    child: Text("Edit")),
+                ScopedModelDescendant<AppModel>(
+                  builder:
+                      (BuildContext context, Widget child, AppModel model) {
+                    return RaisedButton(
+                        onPressed: () async {
+                          await model.deleteSeminar(seminar);
+                        },
+                        child: Text("Delete"));
+                  },
+                ),
+              ],
             )),
       ),
     );

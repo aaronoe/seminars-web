@@ -20,7 +20,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
       } else {
         print("New student length: ${model.students.length}");
         return GridView.count(
-          childAspectRatio: 3,
+          childAspectRatio: 2,
           children: model.students
               .map<Widget>((student) => StudentCard(student: student))
               .toList()
@@ -63,10 +63,23 @@ class StudentCard extends StatelessWidget {
                 0, student.name.length > 15 ? 15 : student.name.length)),
             ScopedModelDescendant<AppModel>(
               builder: (BuildContext context, Widget child, AppModel model) {
-                return FlatButton(
-                    color: Theme.of(context).buttonColor,
-                    onPressed: () async => await model.deleteStudent(student),
-                    child: Text("Delete"));
+                return Column(
+                  children: <Widget>[
+                    RaisedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (BuildContext context) {
+                            return NewStudentForm(
+                                mode: Mode.EDIT, existingStudent: student);
+                          }));
+                        },
+                        child: Text("Edit")),
+                    RaisedButton(
+                        onPressed: () async =>
+                            await model.deleteStudent(student),
+                        child: Text("Delete")),
+                  ],
+                );
               },
             )
           ]),

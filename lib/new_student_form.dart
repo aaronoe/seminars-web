@@ -5,15 +5,33 @@ import 'package:matchings/scoped_models/app_model.dart';
 import 'package:matchings/util/scoped_model.dart';
 
 import 'model/seminar.dart';
+import 'model/student.dart';
 
 class NewStudentForm extends StatefulWidget {
+  final Mode mode;
+  final Student existingStudent;
+
+  const NewStudentForm({Key key, this.mode = Mode.CREATE, this.existingStudent})
+      : super(key: key);
+
   @override
-  _NewStudentFormState createState() => _NewStudentFormState();
+  _NewStudentFormState createState() =>
+      _NewStudentFormState(existingStudent: existingStudent);
 }
+
+enum Mode { CREATE, EDIT }
 
 class _NewStudentFormState extends State<NewStudentForm> {
   final _priorities = List<Seminar>();
-  String _name = "";
+  String name = "";
+  TextEditingController controller;
+
+  _NewStudentFormState({Key key, Student existingStudent}) {
+    if (existingStudent != null) {
+      this.name = existingStudent.name;
+    }
+    controller = TextEditingController(text: name);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +58,10 @@ class _NewStudentFormState extends State<NewStudentForm> {
     return ListView(
       children: <Widget>[
         TextField(
+          controller: controller,
           onChanged: (value) {
             setState(() {
-              _name = value;
+              name = value;
             });
           },
           autofocus: true,
@@ -87,10 +106,10 @@ class _NewStudentFormState extends State<NewStudentForm> {
                   Navigator.of(context).pop();
                 }),
             RaisedButton(
-              onPressed: _name.isEmpty
+              onPressed: name.isEmpty
                   ? null
                   : () async {
-                      await model.createStudent(_name, _priorities);
+                      await model.createStudent(name, _priorities);
                       Navigator.of(context).pop();
                     },
               child: Text('Save'),

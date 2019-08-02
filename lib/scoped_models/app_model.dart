@@ -9,8 +9,9 @@ import 'package:matchings/model/student.dart';
 import 'package:matchings/util/scoped_model.dart';
 
 class AppModel extends Model {
+  static final _BASE_HOST_LOCAL = "0.0.0.0:8000";
   static final _BASE_HOST = "seminar-matching.herokuapp.com/";
-  static final BASE_URL = "https://$_BASE_HOST";
+  static final BASE_URL = "http://$_BASE_HOST_LOCAL";
   final _client = http.Client();
 
   List<Student> _students = [];
@@ -18,7 +19,7 @@ class AppModel extends Model {
   MatchData _matchData;
 
   AppModel() {
-    WebSocket('wss://$_BASE_HOST/')
+    WebSocket('ws://$_BASE_HOST_LOCAL/')
         .onMessage
         .map((item) => SocketData.fromJson(json.decode(item.data)))
         .listen((data) {
@@ -66,6 +67,15 @@ class AppModel extends Model {
   Future createSeminar(String name, int capacity) async {
     await postData(
         "$BASE_URL/seminars", {'name': name, 'capacity': capacity.toString()});
+  }
+
+  Future updateSeminar(Seminar toUpdate) async {
+    await postData("$BASE_URL/seminars/${toUpdate.id}",
+        {'name': toUpdate.name, 'capacity': toUpdate.capacity.toString()});
+  }
+
+  Future updateStudent(Student toUpdate) async {
+    //await postData("$BASE_URL/students/${toUpdate.id}", body)
   }
 
   Future createStudent(String name, List<Seminar> priorities) async {
