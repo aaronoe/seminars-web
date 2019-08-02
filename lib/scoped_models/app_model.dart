@@ -32,6 +32,36 @@ class AppModel extends Model {
     });
   }
 
+  void downloadMatching() {
+    var buffer = StringBuffer();
+
+    matchData.matchings.forEach((matching) {
+      buffer.writeln("${matching.seminar.name} (${matching.seminar.id}):");
+      buffer.writeAll(
+          matching.students.map((student) => "${student.name} (${student.id})"),
+          "\n");
+
+      buffer.writeln("\n");
+    });
+
+    _downloadFile(
+        "matching_${getAlgorithmName(algorithm)}_${DateTime.now().toIso8601String()}.txt",
+        buffer.toString());
+  }
+
+  void _downloadFile(String fileName, String content) {
+    var element = document.createElement('a');
+
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + content);
+    element.setAttribute('download', fileName);
+
+    element.style.display = 'none';
+    document.body.append(element);
+
+    element.click();
+    element.remove();
+  }
+
   List<Student> get students => _students;
   List<Seminar> get seminars => _seminars;
   MatchData get matchData => _matchData;

@@ -49,7 +49,10 @@ class MatchingScreen extends StatelessWidget {
         Container(height: 4.0),
         Text("Runtime: ${model.matchData.runtime}ms"),
         Container(height: 16.0),
-        ComputeButton()
+        ComputeButton(),
+        Container(height: 16.0),
+        RaisedButton(
+            onPressed: () => model.downloadMatching(), child: Text("Download"))
       ],
     );
   }
