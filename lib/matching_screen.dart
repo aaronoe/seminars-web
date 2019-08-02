@@ -36,10 +36,18 @@ class MatchingScreen extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text("Profile ${model.matchData.statistics.profile}"),
+        Text("Profile: ${model.matchData.statistics.profile}"),
         Container(height: 4.0),
         Text(
             "Unassigned Student Count: ${model.matchData.statistics.unassignedCount}"),
+        Container(height: 4.0),
+        Text(
+            "Rank Average: ${model.matchData.statistics.averageRank.toStringAsFixed(3)} (${model.matchData.statistics.averageRankWithUnassigned.toStringAsFixed(3)})"),
+        Container(height: 4.0),
+        Text(
+            "Rank Standard Deviation: ${model.matchData.statistics.rankStandardDeviation.toStringAsFixed(3)} (${model.matchData.statistics.averageStandardDeviationWithUnassigned.toStringAsFixed(3)})"),
+        Container(height: 4.0),
+        Text("Runtime: ${model.matchData.runtime}ms"),
         Container(height: 16.0),
         ComputeButton()
       ],
@@ -47,12 +55,7 @@ class MatchingScreen extends StatelessWidget {
   }
 }
 
-class ComputeButton extends StatefulWidget {
-  @override
-  _ComputeButtonState createState() => _ComputeButtonState();
-}
-
-class _ComputeButtonState extends State<ComputeButton> {
+class ComputeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<AppModel>(
@@ -68,11 +71,9 @@ class _ComputeButtonState extends State<ComputeButton> {
                     .toList(),
                 iconSize: 0.0,
                 onChanged: (Algorithm newValue) {
-                  setState(() {
-                    model.setAlgorithm(newValue);
-                  });
+                  model.setAlgorithm(newValue);
                 }),
-            Container(width: 8.0),
+            Container(width: 16.0),
             RaisedButton(
                 onPressed: () async => await model.getMatching(),
                 child: Text("Find Matching"))

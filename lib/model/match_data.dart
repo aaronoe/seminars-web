@@ -3,13 +3,15 @@ import 'matching.dart';
 class MatchData {
   final List<Matching> matchings;
   final Statistics statistics;
+  final int runtime;
 
-  MatchData(this.matchings, this.statistics);
+  MatchData(this.matchings, this.statistics, this.runtime);
 
   factory MatchData.fromJson(Map<String, dynamic> json) {
     final matchings = Matching.parseResponse(json['matches'] as List<dynamic>);
 
-    return MatchData(matchings, Statistics.fromJson(json["statistics"]));
+    return MatchData(matchings, Statistics.fromJson(json["statistics"]),
+        json['runtime'] as int);
   }
 }
 
