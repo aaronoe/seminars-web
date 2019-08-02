@@ -102,14 +102,26 @@ class _NewStudentFormState extends State<NewStudentForm> {
                           ? Container()
                           : Text("Selected Seminars:"))),
         Divider(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Flex(
+          direction: Axis.horizontal,
           children: <Widget>[
             RaisedButton(
                 child: Text("Cancel"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 }),
+            Expanded(flex: 1, child: Container()),
+            ScopedModelDescendant<AppModel>(
+              builder: (BuildContext context, Widget child, AppModel model) {
+                return RaisedButton(
+                    onPressed: () async {
+                      await model.deleteStudent(widget.existingStudent);
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("Delete"));
+              },
+            ),
+            Container(width: 8.0),
             RaisedButton(
               onPressed: name.isEmpty
                   ? null

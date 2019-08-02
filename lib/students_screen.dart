@@ -61,27 +61,15 @@ class StudentCard extends StatelessWidget {
           children: <Widget>[
             Text(student.name.substring(
                 0, student.name.length > 15 ? 15 : student.name.length)),
-            ScopedModelDescendant<AppModel>(
-              builder: (BuildContext context, Widget child, AppModel model) {
-                return Column(
-                  children: <Widget>[
-                    RaisedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (BuildContext context) {
-                            return NewStudentForm(
-                                mode: Mode.EDIT, existingStudent: student);
-                          }));
-                        },
-                        child: Text("Edit")),
-                    RaisedButton(
-                        onPressed: () async =>
-                            await model.deleteStudent(student),
-                        child: Text("Delete")),
-                  ],
-                );
-              },
-            )
+            RaisedButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (BuildContext context) {
+                    return NewStudentForm(
+                        mode: Mode.EDIT, existingStudent: student);
+                  }));
+                },
+                child: Text("Edit"))
           ]),
     ));
   }

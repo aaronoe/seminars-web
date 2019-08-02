@@ -8,9 +8,11 @@ class Student {
   Student({this.name, this.id, this.preferences});
 
   factory Student.fromJson(Map<String, dynamic> json) {
-    final seminars = (json['preferences'] as List<dynamic>)
-        .map((data) => Seminar.fromJson(data))
-        .toList();
+    final seminars = json['preferences'] == null
+        ? <Seminar>[]
+        : (json['preferences'] as List<dynamic>)
+            .map((data) => Seminar.fromJson(data))
+            .toList();
 
     return Student(
         id: json['id'] as String,
