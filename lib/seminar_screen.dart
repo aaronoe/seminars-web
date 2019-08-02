@@ -82,20 +82,35 @@ Future _showSeminarDialog(BuildContext context,
         actions: <Widget>[
           ScopedModelDescendant<AppModel>(
             builder: (BuildContext context, Widget child, AppModel model) {
-              return FlatButton(
-                child: Text('Save'),
-                onPressed: () async {
-                  if (title.isEmpty) return;
-                  if (mode == Mode.CREATE) {
-                    model.createSeminar(title, capacity);
-                  } else if (mode == Mode.EDIT) {
-                    model.updateSeminar(Seminar(
-                        id: existingSeminar.id,
-                        name: title,
-                        capacity: capacity));
-                  }
-                  Navigator.of(context).pop();
-                },
+              return Row(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: mode == Mode.CREATE
+                        ? Container()
+                        : FlatButton(
+                            onPressed: () async {
+                              await model.deleteSeminar(existingSeminar);
+                              Navigator.of(context).pop();
+                            },
+                            child: Text("Delete")),
+                  ),
+                  FlatButton(
+                    child: Text('Save'),
+                    onPressed: () async {
+                      if (title.isEmpty) return;
+                      if (mode == Mode.CREATE) {
+                        model.createSeminar(title, capacity);
+                      } else if (mode == Mode.EDIT) {
+                        model.updateSeminar(Seminar(
+                            id: existingSeminar.id,
+                            name: title,
+                            capacity: capacity));
+                      }
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
               );
             },
           ),
@@ -117,27 +132,12 @@ class SeminarCard extends StatelessWidget {
         child: ListTile(
             title: Text(seminar.name),
             subtitle: Text("Capacity: ${seminar.capacity}"),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                RaisedButton(
-                    onPressed: () async {
-                      await _showSeminarDialog(context,
-                          mode: Mode.EDIT, existingSeminar: seminar);
-                    },
-                    child: Text("Edit")),
-                ScopedModelDescendant<AppModel>(
-                  builder:
-                      (BuildContext context, Widget child, AppModel model) {
-                    return RaisedButton(
-                        onPressed: () async {
-                          await model.deleteSeminar(seminar);
-                        },
-                        child: Text("Delete"));
-                  },
-                ),
-              ],
-            )),
+            trailing: RaisedButton(
+                onPressed: () async {
+                  await _showSeminarDialog(context,
+                      mode: Mode.EDIT, existingSeminar: seminar);
+                },
+                child: Text("Edit"))),
       ),
     );
   }
