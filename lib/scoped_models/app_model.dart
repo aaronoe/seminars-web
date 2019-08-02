@@ -75,7 +75,11 @@ class AppModel extends Model {
   }
 
   Future updateStudent(Student toUpdate) async {
-    //await postData("$BASE_URL/students/${toUpdate.id}", body)
+    await postData("$BASE_URL/students/${toUpdate.id}", {
+      'name': toUpdate.name,
+      'preferences':
+          toUpdate.preferences.map((seminar) => seminar.toJson()).toList()
+    });
   }
 
   Future createStudent(String name, List<Seminar> priorities) async {

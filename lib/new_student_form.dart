@@ -29,6 +29,10 @@ class _NewStudentFormState extends State<NewStudentForm> {
   _NewStudentFormState({Key key, Student existingStudent}) {
     if (existingStudent != null) {
       this.name = existingStudent.name;
+      if (existingStudent.preferences != null &&
+          existingStudent.preferences.isNotEmpty) {
+        _priorities.addAll(existingStudent.preferences);
+      }
     }
     controller = TextEditingController(text: name);
   }
@@ -73,7 +77,8 @@ class _NewStudentFormState extends State<NewStudentForm> {
             ? Container()
             : Column(
                 children: model.seminars
-                    .where((sem) => !_priorities.contains(sem))
+                    .where((sem) =>
+                        !_priorities.any((other) => other.id == sem.id))
                     .map((seminar) => getSeminarItemWidget(
                         seminar, () => _priorities.add(seminar), "Add", -1))
                     .toList()
@@ -109,7 +114,14 @@ class _NewStudentFormState extends State<NewStudentForm> {
               onPressed: name.isEmpty
                   ? null
                   : () async {
-                      await model.createStudent(name, _priorities);
+                      if (widget.mode == Mode.CREATE) {
+                        await model.createStudent(name, _priorities);
+                      } else if (widget.mode == Mode.EDIT) {
+                        await model.updateStudent(Student(
+                            name: name,
+                            id: widget.existingStudent.id,
+                            preferences: _priorities));
+                      }
                       Navigator.of(context).pop();
                     },
               child: Text('Save'),
