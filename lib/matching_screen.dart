@@ -9,17 +9,25 @@ class MatchingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<AppModel>(
       builder: (BuildContext context, Widget child, AppModel model) {
-        if (model.matchData == null || model.matchData.matchings.isEmpty) {
-          return _buildComputeButton(model);
-        } else {
-          return GridView.count(
-            children: model.matchData.matchings
-                .map<Widget>((matching) => MatchingCard(matching: matching))
-                .toList()
-                  ..insert(0, _buildResultButton(model)),
-            crossAxisCount: (MediaQuery.of(context).size.width / 300).floor(),
-          );
+        switch (model.loadingState) {
+          case MatchingLoadingState.NOT_STARTED:
+            return ComputeButton();
+            break;
+          case MatchingLoadingState.LOADING:
+            return Center(child: CircularProgressIndicator());
+            break;
+          case MatchingLoadingState.DONE:
+            return GridView.count(
+              children: model.matchData.matchings
+                  .map<Widget>((matching) => MatchingCard(matching: matching))
+                  .toList()
+                    ..insert(0, _buildResultButton(model)),
+              crossAxisCount: (MediaQuery.of(context).size.width / 300).floor(),
+            );
+            break;
         }
+
+        return Container();
       },
     );
   }
@@ -28,26 +36,13 @@ class MatchingScreen extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text("Profile ${model.matchData.profile}"),
+        Text("Profile ${model.matchData.statistics.profile}"),
         Container(height: 4.0),
-        Text("Unassigned Student Count: ${model.matchData.unassignedCount}"),
+        Text(
+            "Unassigned Student Count: ${model.matchData.statistics.unassignedCount}"),
         Container(height: 16.0),
         ComputeButton()
       ],
-    );
-  }
-
-  Widget _buildButtonForAlgorithm(AppModel model, String algorithm) {
-    return RaisedButton(
-        child: Text(algorithm),
-        onPressed: () async {
-          await model.getMatching(algorithm);
-        });
-  }
-
-  Widget _buildComputeButton(AppModel model) {
-    return Center(
-      child: ComputeButton(),
     );
   }
 }
@@ -58,37 +53,31 @@ class ComputeButton extends StatefulWidget {
 }
 
 class _ComputeButtonState extends State<ComputeButton> {
-  String selection = "hungarian";
-
   @override
   Widget build(BuildContext context) {
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-      DropdownButton<String>(
-          value: selection,
-          items: <String>[
-            "hungarian",
-            "rsd",
-            "popular",
-            "max-pareto",
-            "popular-mod"
-          ]
-              .map((item) => DropdownMenuItem(child: Text(item), value: item))
-              .toList(),
-          iconSize: 0.0,
-          onChanged: (String newValue) {
-            setState(() {
-              selection = newValue;
-            });
-          }),
-      Container(width: 8.0),
-      ScopedModelDescendant<AppModel>(
+    return ScopedModelDescendant<AppModel>(
         builder: (BuildContext context, Widget child, AppModel model) {
-          return RaisedButton(
-              onPressed: () async => await model.getMatching(selection),
-              child: Text("Find Matching"));
-        },
-      )
-    ]);
+      return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            DropdownButton<Algorithm>(
+                value: model.algorithm,
+                items: Algorithm.values
+                    .map((item) => DropdownMenuItem(
+                        child: Text(getAlgorithmName(item)), value: item))
+                    .toList(),
+                iconSize: 0.0,
+                onChanged: (Algorithm newValue) {
+                  setState(() {
+                    model.setAlgorithm(newValue);
+                  });
+                }),
+            Container(width: 8.0),
+            RaisedButton(
+                onPressed: () async => await model.getMatching(),
+                child: Text("Find Matching"))
+          ]);
+    });
   }
 }
 

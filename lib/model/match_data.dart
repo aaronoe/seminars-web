@@ -2,16 +2,44 @@ import 'matching.dart';
 
 class MatchData {
   final List<Matching> matchings;
-  final int unassignedCount;
-  final List<int> profile;
+  final Statistics statistics;
 
-  MatchData(this.matchings, this.unassignedCount, this.profile);
+  MatchData(this.matchings, this.statistics);
 
   factory MatchData.fromJson(Map<String, dynamic> json) {
     final matchings = Matching.parseResponse(json['matches'] as List<dynamic>);
-    final profile =
-        (json['profile'] as List<dynamic>).map((item) => item as int).toList();
 
-    return MatchData(matchings, json['unassignedCount'] as int, profile);
+    return MatchData(matchings, Statistics.fromJson(json["statistics"]));
+  }
+}
+
+class Statistics {
+  final int unassignedCount;
+  final List<int> profile;
+  final double averageRank;
+  final double rankStandardDeviation;
+  final double averageRankWithUnassigned;
+  final double averageStandardDeviationWithUnassigned;
+
+  Statistics(
+      this.unassignedCount,
+      this.profile,
+      this.averageRank,
+      this.rankStandardDeviation,
+      this.averageRankWithUnassigned,
+      this.averageStandardDeviationWithUnassigned);
+
+  factory Statistics.fromJson(Map<String, dynamic> json) {
+    final profile = (json['profile'] as List<dynamic>)
+        .map((item) => (item as double).floor())
+        .toList();
+
+    return Statistics(
+        (json['unassignedCount'] as double).floor(),
+        profile,
+        json['averageRank'] as double,
+        json['standardDeviationRank'] as double,
+        json['averageRankWithUnassigned'] as double,
+        json['standardDeviationWithUnassigned'] as double);
   }
 }

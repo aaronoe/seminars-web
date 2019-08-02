@@ -17,6 +17,8 @@ class AppModel extends Model {
   List<Student> _students = [];
   List<Seminar> _seminars = [];
   MatchData _matchData;
+  MatchingLoadingState _loadingState = MatchingLoadingState.NOT_STARTED;
+  Algorithm _selectedAlgorithm = Algorithm.hungarian;
 
   AppModel() {
     WebSocket('ws://$_BASE_HOST_LOCAL/')
@@ -33,13 +35,26 @@ class AppModel extends Model {
   List<Student> get students => _students;
   List<Seminar> get seminars => _seminars;
   MatchData get matchData => _matchData;
+  MatchingLoadingState get loadingState => _loadingState;
+  Algorithm get algorithm => _selectedAlgorithm;
 
-  Future getMatching(String algorithm) async {
-    final response = await _client.get("$BASE_URL/match/$algorithm");
+  void setAlgorithm(Algorithm algorithm) {
+    this._selectedAlgorithm = algorithm;
+    notifyListeners();
+  }
+
+  Future getMatching() async {
+    _loadingState = MatchingLoadingState.LOADING;
+    notifyListeners();
+
+    final response =
+        await _client.get("$BASE_URL/match/${getAlgorithmName(algorithm)}");
     final parsed = json.decode(response.body);
 
     print(parsed);
     _matchData = MatchData.fromJson(parsed);
+
+    _loadingState = MatchingLoadingState.DONE;
     notifyListeners();
   }
 
@@ -88,4 +103,25 @@ class AppModel extends Model {
       'preferences': priorities.map((seminar) => seminar.toJson()).toList()
     });
   }
+}
+
+enum MatchingLoadingState { NOT_STARTED, LOADING, DONE }
+
+enum Algorithm { hungarian, rsd, max_pareto, popular, popular_mod }
+
+String getAlgorithmName(Algorithm algorithm) {
+  switch (algorithm) {
+    case Algorithm.hungarian:
+      return "hungarian";
+    case Algorithm.rsd:
+      return "rsd";
+    case Algorithm.max_pareto:
+      return "max-pareto";
+    case Algorithm.popular:
+      return "popular";
+    case Algorithm.popular_mod:
+      return "popular-mod";
+  }
+
+  return "hungarian";
 }
