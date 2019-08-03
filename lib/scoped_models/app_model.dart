@@ -32,7 +32,26 @@ class AppModel extends Model {
     });
   }
 
+  void selectFile() async {
+    InputElement input = document.createElement('input');
+    input.type = 'file';
+
+    input.onChange.take(1).listen((dynamic event) async {
+      File file = event.target.files[0];
+      FormData data = FormData();
+      data.appendBlob("file", file);
+      var request = HttpRequest();
+      request.open("POST", "$BASE_URL/file");
+      request.send(data);
+      input.remove();
+    });
+
+    input.click();
+  }
+
   void downloadMatching() {
+    selectFile();
+    return;
     var buffer = StringBuffer();
 
     matchData.matchings.forEach((matching) {

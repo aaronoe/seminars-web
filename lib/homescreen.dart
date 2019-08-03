@@ -15,15 +15,29 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           actions: <Widget>[
             ScopedModelDescendant<AppModel>(
+              rebuildOnChange: false,
               builder: (BuildContext context, Widget child, AppModel model) {
-                return FlatButton(
-                  child: Text(
-                    "Download Data",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onPressed: () async {
-                    await model.downloadData();
-                  },
+                return Row(
+                  children: <Widget>[
+                    FlatButton(
+                      child: Text(
+                        "Import Data",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () {
+                        model.selectFile();
+                      },
+                    ),
+                    FlatButton(
+                      child: Text(
+                        "Download Data",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () async {
+                        await model.downloadData();
+                      },
+                    ),
+                  ],
                 );
               },
             )
