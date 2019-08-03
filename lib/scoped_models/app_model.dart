@@ -22,13 +22,14 @@ class AppModel extends Model {
   MatchingLoadingState _loadingState = MatchingLoadingState.NOT_STARTED;
   Algorithm _selectedAlgorithm = Algorithm.hungarian;
   File _selectedFile;
+  SocketState _connectionState = SocketState.Loading;
 
   AppModel() {
     WebSocket('ws://$_BASE_HOST_LOCAL/')
         .onMessage
         .map((item) => SocketData.fromJson(json.decode(item.data)))
         .listen((data) {
-      print("New data: $data");
+      _connectionState = SocketState.Live;
       _students = data.students;
       _seminars = data.seminars;
       notifyListeners();
@@ -120,6 +121,7 @@ class AppModel extends Model {
   MatchingLoadingState get loadingState => _loadingState;
   Algorithm get algorithm => _selectedAlgorithm;
   File get selectedFile => _selectedFile;
+  SocketState get connectionState => _connectionState;
 
   void setAlgorithm(Algorithm algorithm) {
     this._selectedAlgorithm = algorithm;
@@ -195,6 +197,8 @@ class AppModel extends Model {
 enum MatchingLoadingState { NOT_STARTED, LOADING, DONE }
 
 enum Algorithm { hungarian, rsd, max_pareto, popular, popular_mod }
+
+enum SocketState { Loading, Live }
 
 String _getDatasetPostName(Dataset dataset) {
   switch (dataset) {

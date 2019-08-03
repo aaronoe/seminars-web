@@ -15,7 +15,26 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: HomePage(),
+        home: ScopedModelDescendant<AppModel>(
+          builder: (BuildContext context, Widget child, AppModel model) {
+            if (model.connectionState == SocketState.Loading) {
+              return Scaffold(
+                  body: Center(
+                      child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  Container(
+                    height: 16.0,
+                  ),
+                  Text("Connecting to server. Please wait.")
+                ],
+              )));
+            } else {
+              return HomePage();
+            }
+          },
+        ),
       ),
     );
   }
