@@ -1,5 +1,6 @@
 import 'package:flutter_web/material.dart';
 import 'package:matchings/scoped_models/app_model.dart';
+import 'package:matchings/select_data_dialog.dart';
 import 'package:matchings/seminar_screen.dart';
 import 'package:matchings/students_screen.dart';
 import 'package:matchings/util/scoped_model.dart';
@@ -24,8 +25,13 @@ class HomePage extends StatelessWidget {
                         "Import Data",
                         style: TextStyle(color: Colors.white),
                       ),
-                      onPressed: () {
-                        model.selectFile();
+                      onPressed: () async {
+                        //model.selectFile();
+                        await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return SelectDataDialog();
+                            });
                       },
                     ),
                     FlatButton(

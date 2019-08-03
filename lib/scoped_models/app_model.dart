@@ -8,6 +8,8 @@ import 'package:matchings/model/socket_data.dart';
 import 'package:matchings/model/student.dart';
 import 'package:matchings/util/scoped_model.dart';
 
+import '../select_data_dialog.dart';
+
 class AppModel extends Model {
   static final _BASE_HOST_LOCAL = "0.0.0.0:8000";
   static final _BASE_HOST = "seminar-matching.herokuapp.com/";
@@ -19,6 +21,7 @@ class AppModel extends Model {
   MatchData _matchData;
   MatchingLoadingState _loadingState = MatchingLoadingState.NOT_STARTED;
   Algorithm _selectedAlgorithm = Algorithm.hungarian;
+  File _selectedFile;
 
   AppModel() {
     WebSocket('ws://$_BASE_HOST_LOCAL/')
@@ -32,26 +35,56 @@ class AppModel extends Model {
     });
   }
 
-  void selectFile() async {
+  void uploadFile(File file) async {
+    FormData data = FormData();
+    data.appendBlob("file", file);
+    var request = HttpRequest();
+    request.open("POST", "$BASE_URL/file");
+    request.send(data);
+  }
+
+  Future<File> pickFile() async {
     InputElement input = document.createElement('input');
     input.type = 'file';
 
-    input.onChange.take(1).listen((dynamic event) async {
-      File file = event.target.files[0];
-      FormData data = FormData();
-      data.appendBlob("file", file);
-      var request = HttpRequest();
-      request.open("POST", "$BASE_URL/file");
-      request.send(data);
-      input.remove();
-    });
+    input.click();
+    dynamic event = await input.onChange.first;
+    File file = event.target.files[0];
+    if (file != null) {
+      _selectedFile = file;
+      notifyListeners();
+    }
 
+    input.remove();
+    return file;
+  }
+
+  void uploadAsMultipart() {
+    InputElement input = document.createElement('input');
+    input.type = 'file';
+
+    input.onChange.listen((e) {
+      // read file content as dataURL
+      final files = input.files;
+      if (files.length == 1) {
+        final file = files[0];
+        final reader = new FileReader();
+        reader.onLoad.listen((e) {
+          var mreq =
+              new http.MultipartRequest("POST", Uri.parse("$BASE_URL/upload"));
+          mreq.files.add(http.MultipartFile.fromString("file", reader.result));
+
+          mreq.send().then((response) {
+            if (response.statusCode == 200) print("Uploaded!");
+          });
+        });
+        reader.readAsDataUrl(file);
+      }
+    });
     input.click();
   }
 
   void downloadMatching() {
-    selectFile();
-    return;
     var buffer = StringBuffer();
 
     matchData.matchings.forEach((matching) {
@@ -86,6 +119,7 @@ class AppModel extends Model {
   MatchData get matchData => _matchData;
   MatchingLoadingState get loadingState => _loadingState;
   Algorithm get algorithm => _selectedAlgorithm;
+  File get selectedFile => _selectedFile;
 
   void setAlgorithm(Algorithm algorithm) {
     this._selectedAlgorithm = algorithm;
@@ -152,11 +186,32 @@ class AppModel extends Model {
       'preferences': priorities.map((seminar) => seminar.toJson()).toList()
     });
   }
+
+  Future changeDataset(Dataset dataset) async {
+    await postData("$BASE_URL/dataset", {'name': _getDatasetPostName(dataset)});
+  }
 }
 
 enum MatchingLoadingState { NOT_STARTED, LOADING, DONE }
 
 enum Algorithm { hungarian, rsd, max_pareto, popular, popular_mod }
+
+String _getDatasetPostName(Dataset dataset) {
+  switch (dataset) {
+    case Dataset.PrefLib1:
+      return "PrefLib1";
+    case Dataset.PrefLib2:
+      return "PrefLib2";
+    case Dataset.Zipfian:
+      return "Zipfian";
+    case Dataset.Uniform:
+      return "Uniform";
+    case Dataset.Custom:
+      return "Custom";
+  }
+
+  return null;
+}
 
 String getAlgorithmName(Algorithm algorithm) {
   switch (algorithm) {

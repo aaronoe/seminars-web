@@ -51,33 +51,30 @@ Future _showSeminarDialog(BuildContext context,
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text('Create new seminar'),
-        content: Form(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                autofocus: true,
-                decoration: InputDecoration(
-                    labelText: 'Seminar title',
-                    hintText: 'eg. Graphalgorithms'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextField(
+              autofocus: true,
+              decoration: InputDecoration(
+                  labelText: 'Seminar title', hintText: 'eg. Graphalgorithms'),
+              onChanged: (value) {
+                title = value;
+              },
+              controller: titleController,
+            ),
+            TextField(
+                controller: capacityController,
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  WhitelistingTextInputFormatter.digitsOnly
+                ],
                 onChanged: (value) {
-                  title = value;
+                  capacity = int.parse(value);
                 },
-                controller: titleController,
-              ),
-              TextField(
-                  controller: capacityController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    WhitelistingTextInputFormatter.digitsOnly
-                  ],
-                  onChanged: (value) {
-                    capacity = int.parse(value);
-                  },
-                  decoration: InputDecoration(
-                      labelText: "Capacity", hintText: "eg. 12"))
-            ],
-          ),
+                decoration:
+                    InputDecoration(labelText: "Capacity", hintText: "eg. 12"))
+          ],
         ),
         actions: <Widget>[
           ScopedModelDescendant<AppModel>(
