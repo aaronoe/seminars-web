@@ -72,7 +72,6 @@ class ComputeButton extends StatelessWidget {
                     .map((item) => DropdownMenuItem(
                         child: Text(getAlgorithmName(item)), value: item))
                     .toList(),
-                iconSize: 0.0,
                 onChanged: (Algorithm newValue) {
                   model.setAlgorithm(newValue);
                 }),

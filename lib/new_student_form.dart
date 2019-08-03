@@ -40,6 +40,7 @@ class _NewStudentFormState extends State<NewStudentForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Center(
         child: SizedBox(
           width: max(MediaQuery.of(context).size.width / 4, 300),
@@ -111,16 +112,19 @@ class _NewStudentFormState extends State<NewStudentForm> {
                   Navigator.of(context).pop();
                 }),
             Expanded(flex: 1, child: Container()),
-            ScopedModelDescendant<AppModel>(
-              builder: (BuildContext context, Widget child, AppModel model) {
-                return RaisedButton(
-                    onPressed: () async {
-                      await model.deleteStudent(widget.existingStudent);
-                      Navigator.of(context).pop();
+            widget.mode == Mode.CREATE
+                ? Container()
+                : ScopedModelDescendant<AppModel>(
+                    builder:
+                        (BuildContext context, Widget child, AppModel model) {
+                      return RaisedButton(
+                          onPressed: () async {
+                            await model.deleteStudent(widget.existingStudent);
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Delete"));
                     },
-                    child: Text("Delete"));
-              },
-            ),
+                  ),
             Container(width: 8.0),
             RaisedButton(
               onPressed: name.isEmpty

@@ -55,7 +55,7 @@ class _SelectDataDialogState extends State<SelectDataDialog> {
               RadioListTile(
                   title: model.selectedFile != null
                       ? Text("Custom (${model.selectedFile.name})")
-                      : Text("Custom"),
+                      : Text("Custom JSON File"),
                   value: Dataset.Custom,
                   groupValue: _dataset,
                   onChanged: (dataset) async {
