@@ -23,6 +23,7 @@ class AppModel extends Model {
   Algorithm _selectedAlgorithm = Algorithm.hungarian;
   File _selectedFile;
   SocketState _connectionState = SocketState.Loading;
+  AppMode _appMode;
 
   AppModel() {
     WebSocket('ws://$_BASE_HOST_LOCAL/')
@@ -34,6 +35,11 @@ class AppModel extends Model {
       _seminars = data.seminars;
       notifyListeners();
     });
+  }
+
+  void setAppMode(AppMode mode) {
+    _appMode = mode;
+    notifyListeners();
   }
 
   void uploadFile(File file) async {
@@ -122,6 +128,7 @@ class AppModel extends Model {
   Algorithm get algorithm => _selectedAlgorithm;
   File get selectedFile => _selectedFile;
   SocketState get connectionState => _connectionState;
+  AppMode get appMode => _appMode;
 
   void setAlgorithm(Algorithm algorithm) {
     this._selectedAlgorithm = algorithm;
@@ -199,6 +206,8 @@ enum MatchingLoadingState { NOT_STARTED, LOADING, DONE }
 enum Algorithm { hungarian, rsd, max_pareto, popular, popular_mod }
 
 enum SocketState { Loading, Live }
+
+enum AppMode { Student, Admin }
 
 String _getDatasetPostName(Dataset dataset) {
   switch (dataset) {

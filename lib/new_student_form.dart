@@ -39,23 +39,57 @@ class _NewStudentFormState extends State<NewStudentForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
+    return AlertDialog(
+      content: Center(
         child: SizedBox(
           width: max(MediaQuery.of(context).size.width / 4, 300),
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ScopedModelDescendant<AppModel>(
-                builder: (BuildContext context, Widget child, AppModel model) {
-                  return getFormBody(model, context);
-                },
-              ),
-            ),
+          child: ScopedModelDescendant<AppModel>(
+            builder: (BuildContext context, Widget child, AppModel model) {
+              return getFormBody(model, context);
+            },
           ),
         ),
       ),
+      actions: <Widget>[
+        FlatButton(
+            child: Text("Cancel"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+        widget.mode == Mode.CREATE
+            ? Container()
+            : ScopedModelDescendant<AppModel>(
+                builder: (BuildContext context, Widget child, AppModel model) {
+                  return FlatButton(
+                      onPressed: () async {
+                        await model.deleteStudent(widget.existingStudent);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("Delete"));
+                },
+              ),
+        Container(width: 8.0),
+        ScopedModelDescendant<AppModel>(
+          builder: (BuildContext context, Widget child, AppModel model) {
+            return FlatButton(
+              onPressed: name.isEmpty
+                  ? null
+                  : () async {
+                      if (widget.mode == Mode.CREATE) {
+                        await model.createStudent(name, _priorities);
+                      } else if (widget.mode == Mode.EDIT) {
+                        await model.updateStudent(Student(
+                            name: name,
+                            id: widget.existingStudent.id,
+                            preferences: _priorities));
+                      }
+                      Navigator.of(context).pop();
+                    },
+              child: Text('Save'),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -102,48 +136,6 @@ class _NewStudentFormState extends State<NewStudentForm> {
                       _priorities.isEmpty
                           ? Container()
                           : Text("Selected Seminars:"))),
-        Divider(),
-        Flex(
-          direction: Axis.horizontal,
-          children: <Widget>[
-            RaisedButton(
-                child: Text("Cancel"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                }),
-            Expanded(flex: 1, child: Container()),
-            widget.mode == Mode.CREATE
-                ? Container()
-                : ScopedModelDescendant<AppModel>(
-                    builder:
-                        (BuildContext context, Widget child, AppModel model) {
-                      return RaisedButton(
-                          onPressed: () async {
-                            await model.deleteStudent(widget.existingStudent);
-                            Navigator.of(context).pop();
-                          },
-                          child: Text("Delete"));
-                    },
-                  ),
-            Container(width: 8.0),
-            RaisedButton(
-              onPressed: name.isEmpty
-                  ? null
-                  : () async {
-                      if (widget.mode == Mode.CREATE) {
-                        await model.createStudent(name, _priorities);
-                      } else if (widget.mode == Mode.EDIT) {
-                        await model.updateStudent(Student(
-                            name: name,
-                            id: widget.existingStudent.id,
-                            preferences: _priorities));
-                      }
-                      Navigator.of(context).pop();
-                    },
-              child: Text('Save'),
-            ),
-          ],
-        )
       ],
     );
   }

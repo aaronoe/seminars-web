@@ -36,10 +36,11 @@ class _StudentsScreenState extends State<StudentsScreen> {
       child: Center(
           child: RaisedButton(
               onPressed: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (BuildContext context) {
-                  return NewStudentForm();
-                }));
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return NewStudentForm();
+                    });
               },
               child: Text("Add new"))),
     );
@@ -63,11 +64,12 @@ class StudentCard extends StatelessWidget {
                 0, student.name.length > 15 ? 15 : student.name.length)),
             RaisedButton(
                 onPressed: () {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (BuildContext context) {
-                    return NewStudentForm(
-                        mode: Mode.EDIT, existingStudent: student);
-                  }));
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return NewStudentForm(
+                            mode: Mode.EDIT, existingStudent: student);
+                      });
                 },
                 child: Text("Edit"))
           ]),
