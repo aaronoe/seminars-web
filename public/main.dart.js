@@ -45320,8 +45320,8 @@ $0:function(){this.a.$0()},
 $S:1}
 B.aK.prototype={
 EH:function(a){var u,t,s
-this.d="https://seminar-matching.herokuapp.com/"
-u=W.a_f("wss://seminar-matching.herokuapp.com/")
+this.d="http://0.0.0.0:8000/"
+u=W.a_f("ws://0.0.0.0:8000/")
 t=W.i_
 s=X.h9
 new P.N1(H.e(new B.yc(),{func:1,ret:s,args:[t]}),new W.it(u,"message",!1,[t]),[t,s]).Qe(new B.yd(this))},
